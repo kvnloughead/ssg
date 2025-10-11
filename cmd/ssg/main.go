@@ -34,7 +34,10 @@ func main() {
 
 	switch os.Args[1] {
 	case "build":
-		buildCmd.Parse(os.Args[2:])
+		if err := buildCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing command arguments: %v\n", err)
+			os.Exit(1)
+		}
 		if err := builder.Build(*buildConfig, *buildOutput); err != nil {
 			fmt.Fprintf(os.Stderr, "Error building site: %v\n", err)
 			os.Exit(1)
@@ -42,14 +45,20 @@ func main() {
 		fmt.Println("Site built successfully!")
 
 	case "serve":
-		serveCmd.Parse(os.Args[2:])
+		if err := serveCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing command arguments: %v\n", err)
+			os.Exit(1)
+		}
 		if err := builder.Serve(*servePort); err != nil {
 			fmt.Fprintf(os.Stderr, "Error serving site: %v\n", err)
 			os.Exit(1)
 		}
 
 	case "new":
-		newCmd.Parse(os.Args[2:])
+		if err := newCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing command arguments: %v\n", err)
+			os.Exit(1)
+		}
 		if *newTitle == "" {
 			fmt.Fprintln(os.Stderr, "Error: post title is required")
 			newCmd.Usage()

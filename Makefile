@@ -105,11 +105,12 @@ lint:
 	@echo "Running staticcheck..."
 	@staticcheck ./...
 
-## security: run security analysis
+## security: run security analysis. This is a CLI the interacts with the users local files, so G304 is excluded.
 .PHONY: security
 security:
 	@echo "Running gosec security analysis..."
-	@gosec ./...
+	@echo "This is a CLI the interacts with the users local files, so G304 is excluded."
+	@gosec -exclude=G304 ./...
 
 # ============================================================
 # CONTINUOUS INTEGRATION

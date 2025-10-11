@@ -3,6 +3,7 @@ package builder
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -66,7 +67,7 @@ func Build(configPath, outputDir string) error {
 	if err := os.RemoveAll(outputDir); err != nil {
 		return fmt.Errorf("cleaning output directory: %w", err)
 	}
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	if err := os.MkdirAll(outputDir, 0750); err != nil {
 		return fmt.Errorf("creating output directory: %w", err)
 	}
 
@@ -110,7 +111,19 @@ func Serve(port string) error {
 	fmt.Printf("Serving site at http://localhost%s\n", addr)
 	fmt.Println("Press Ctrl+C to stop")
 
-	return http.ListenAndServe(addr, nil)
+	// Initialize structured logger to stdout with default settings.
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true, // include file and line number
+	}))
+
+	// Start HTTP server
+	srv := &http.Server{
+		Addr:              addr,
+		ErrorLog:          slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		ReadHeaderTimeout: 60 * time.Second,
+	}
+
+	return srv.ListenAndServe()
 }
 
 // NewPost creates a new markdown post with frontmatter template
@@ -145,7 +158,7 @@ Write your post here...
 `, title, time.Now().Format(time.RFC3339))
 
 	// Write file
-	if err := os.WriteFile(filepath, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath, []byte(content), 0600); err != nil {
 		return fmt.Errorf("writing post file: %w", err)
 	}
 

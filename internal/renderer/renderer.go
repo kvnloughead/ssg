@@ -68,7 +68,7 @@ func (r *Renderer) RenderIndex(posts []*parser.Post, config Config, outputPath s
 func (r *Renderer) renderToFile(templateName string, data PageData, outputPath string) error {
 	// Create output directory if it doesn't exist
 	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("creating output directory: %w", err)
 	}
 

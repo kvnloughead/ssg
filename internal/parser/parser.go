@@ -108,8 +108,9 @@ func (p *Parser) Parse(content []byte, path string) (*Post, error) {
 		Description: fm.Description,
 		Tags:        fm.Tags,
 		Draft:       fm.Draft,
-		Content:     template.HTML(buf.String()),
-		RawContent:  string(markdown),
+		// #nosec G203 -- HTML output from goldmark md parser, not from user input
+		Content:    template.HTML(buf.String()),
+		RawContent: string(markdown),
 	}
 
 	return post, nil
