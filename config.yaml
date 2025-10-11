@@ -1,0 +1,4 @@
+title: My Blog
+description: A blog built with a custom Go static site generator
+baseUrl: https://yourblog.com
+author: Your Name

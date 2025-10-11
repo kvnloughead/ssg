@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Abort push if tests fail
+set -euo pipefail
+
+# Run tests quickly before allowing push
+echo "Running tests before push..."
+if ! make ci/local; then
+  echo "Continuous integration failed. Aborting push."
+  exit 1
+fi
+
+echo "Continuous integration passed. Proceeding with push."
+exit 0
