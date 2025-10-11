@@ -5,6 +5,7 @@ package parser
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,8 +26,8 @@ type Post struct {
 	Description string
 	Tags        []string
 	Draft       bool
-	Content     string // HTML content
-	RawContent  string // Original markdown
+	Content     template.HTML // Unescaped HTML content
+	RawContent  string        // Original markdown
 }
 
 // Frontmatter represents the YAML frontmatter
@@ -107,7 +108,7 @@ func (p *Parser) Parse(content []byte, path string) (*Post, error) {
 		Description: fm.Description,
 		Tags:        fm.Tags,
 		Draft:       fm.Draft,
-		Content:     buf.String(),
+		Content:     template.HTML(buf.String()),
 		RawContent:  string(markdown),
 	}
 
