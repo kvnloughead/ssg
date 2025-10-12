@@ -1,9 +1,10 @@
 name: ci
 
 on:
-  # Runs when a pull request into main is created or when changes are pushed to
-  # the compare branch
   pull_request:
+    branches: [main]
+
+  push:
     branches: [main]
 
 jobs:
@@ -45,8 +46,9 @@ jobs:
       - name: Install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
+      # This is a CLI that interacts with the user's local files, so G304 is excluded.
       - name: Run security analysis
-        run: gosec ./...
+        run: gosec -exclude=G304 ./...
 
       - name: Install djlint
         run: pip3 install djlint

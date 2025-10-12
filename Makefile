@@ -120,7 +120,7 @@ lint: lint/templates
 	@echo "Running staticcheck..."
 	@staticcheck ./...
 
-## security: run security analysis. This is a CLI the interacts with the users local files, so G304 is excluded.
+## security: run security analysis. This is a CLI that interacts with the user's local files, so G304 is excluded.
 .PHONY: security
 security:
 	@echo "Running gosec security analysis..."
@@ -192,33 +192,3 @@ help:
 .PHONY: confirm
 confirm:
 	@echo 'Are you sure? [y/N] ' && read ans && [ $${ans:-N} = y ]
-
-# ============================================================
-# DOCKER
-# ============================================================
-
-## docker/build: build the docker image using the current architecture
-.PHONY: docker/build
-docker/build:
-	docker build -t ${DOCKER_IMAGE_NAME} .
-
-## docker/build: run the docker image on port 8080 using the current architecture
-.PHONY: docker/run
-docker/run:
-	docker run -p 8080:8080 ${DOCKER_IMAGE_NAME}:latest
-
-## docker/push: push image with :latest tag to docker hub
-.PHONY: docker/push
-docker/push:
-	docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
-	docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}
-
-## docker/push/artifact: push docker image to gcloud run artifact registry
-.PHONY: docker/push/artifact
-docker/push/artifact: # TODO - add ARTIFACT_URL
-	docker builds submit --tag ARTIFACT_URL/${DOCKER_IMAGE_NAME}:latest .
-
-## docker/build/amd64: build for cloud run (AMD64)
-.PHONY: docker/build/cloudrun
-docker/build/cloudrun:
-			docker build --platform linux/amd64 -t ${DOCKER_IMAGE_NAME} .
