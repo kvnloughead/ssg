@@ -1,5 +1,6 @@
 # SSG - Static Site Generator
 
+[![ci](https://github.com/kvnloughead/ssg/actions/workflows/ci.yml/badge.svg)](https://github.com/kvnloughead/ssg/actions/workflows/ci.yml)
 [![Code style: djLint](https://img.shields.io/badge/html%20style-djLint-blue.svg)](https://github.com/djlint/djlint)
 
 
