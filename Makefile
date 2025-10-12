@@ -48,9 +48,19 @@ ifndef TITLE
 endif
 	@./bin/ssg new --title "$(TITLE)"
 
-## dev: build binary, generate site, and serve
-.PHONY: dev
-dev: build generate serve
+## dev: build binary, generate site, and serve (no watch)
+.PHONY: run/dev
+run/dev: build generate serve
+
+## run/air: run with air for live reload (watches all files)
+.PHONY: run/air
+run/air:
+	@if ! command -v air > /dev/null; then \
+		echo "Installing air for live reload..."; \
+		go install github.com/air-verse/air@latest; \
+	fi
+	@air
+
 
 # ============================================================
 # TESTING AND FORMATING
