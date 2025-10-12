@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kvnloughead/ssg/internal/builder"
+	"github.com/kvnloughead/ssg/internal/ssg"
 )
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error parsing command arguments: %v\n", err)
 			os.Exit(1)
 		}
-		if err := builder.Build(*buildConfig, *buildOutput); err != nil {
+		if err := ssg.Build(*buildConfig, *buildOutput); err != nil {
 			fmt.Fprintf(os.Stderr, "Error building site: %v\n", err)
 			os.Exit(1)
 		}
@@ -49,7 +49,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error parsing command arguments: %v\n", err)
 			os.Exit(1)
 		}
-		if err := builder.Serve(*servePort); err != nil {
+		if err := ssg.Serve(*servePort); err != nil {
 			fmt.Fprintf(os.Stderr, "Error serving site: %v\n", err)
 			os.Exit(1)
 		}
@@ -64,7 +64,7 @@ func main() {
 			newCmd.Usage()
 			os.Exit(1)
 		}
-		if err := builder.NewPost(*newTitle); err != nil {
+		if err := ssg.NewPost(*newTitle); err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating post: %v\n", err)
 			os.Exit(1)
 		}
