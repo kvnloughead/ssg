@@ -11,6 +11,9 @@ import (
 	"strings"
 	"time"
 
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -49,12 +52,20 @@ type Parser struct {
 //   - Extensions: GitHub Flavored, footnotes, smart punctuation
 //   - Auto-generate heading ID's
 //   - newlines -> <br>
+//   - Syntax highlighting via https://github.com/alecthomas/chroma
 func New() *Parser {
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,         // GitHub Flavored Markdown
 			extension.Footnote,    // Footnote support
 			extension.Typographer, // Smart punctuation
+			highlighting.NewHighlighting( // Synax highlighting
+				highlighting.WithStyle("manni"),
+				highlighting.WithFormatOptions(
+					chromahtml.WithLineNumbers(true),
+					chromahtml.WrapLongLines(true),
+				),
+			),
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(), // Auto-generate heading IDs

@@ -124,7 +124,6 @@ main {
 }
 
 .post-content pre {
-  background-color: #f5f5f5;
   padding: 15px;
   border-radius: 5px;
   overflow-x: auto;
@@ -137,7 +136,7 @@ main {
 }
 
 code span {
-  line-height: 1;
+  line-height: 1.5;
 }
 
 .post-content a {

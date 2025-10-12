@@ -432,7 +432,7 @@ func main() {
 		"<code>",
 		"<ul>",
 		"<ol>",
-		"<pre>",
+		"<pre",
 		"<blockquote>",
 		"<a href=",
 		"<img",
