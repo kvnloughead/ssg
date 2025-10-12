@@ -12,11 +12,12 @@ build:
 
 ## deps: install dependencies
 .PHONY: deps
-deps:
+deps: lint/install
 	@echo "Installing dependencies..."
 	@go mod download
 	@go get gopkg.in/yaml.v3
 	@go get github.com/yuin/goldmark
+
 
 ## init: initialize project (run once)
 .PHONY: init
@@ -108,10 +109,14 @@ lint/install:
 	@echo "Installing linting tools (staticcheck and gosec)..."
 	@go install honnef.co/go/tools/cmd/staticcheck@latest
 	@go install github.com/securego/gosec/v2/cmd/gosec@latest
+	@if ! command -v djlint > /dev/null; then \
+		echo "Warning: djlint not found. Install with: brew install djlint"; \
+	fi
+
 
 ## lint: run static analysis
 .PHONY: lint
-lint:
+lint: lint/templates
 	@echo "Running staticcheck..."
 	@staticcheck ./...
 
@@ -121,6 +126,24 @@ security:
 	@echo "Running gosec security analysis..."
 	@echo "This is a CLI the interacts with the users local files, so G304 is excluded."
 	@gosec -exclude=G304 ./...
+
+## lint/templates: lint HTML templates with djlint
+.PHONY: lint/templates
+lint/templates:
+	@echo "Linting templates..."
+	@djlint --profile=golang templates/
+
+## format/templates/check: check templates formatting
+.PHONY: format/templates/check
+format/templates/check:
+	@echo "Checking template formatting..."
+	@djlint --profile=golang --check templates/
+
+## format/templates: format HTML templates with djlint
+.PHONY: format/templates
+format/templates:
+	@echo "Formatting templates..."
+	@djlint --profile=golang --reformat templates/
 
 # ============================================================
 # CONTINUOUS INTEGRATION

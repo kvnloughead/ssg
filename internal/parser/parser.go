@@ -25,6 +25,7 @@ type Post struct {
 	Slug        string
 	Description string
 	Tags        []string
+	Keywords    string // Comma-separated string of tags
 	Draft       bool
 	Content     template.HTML // Unescaped HTML content
 	RawContent  string        // Original markdown
@@ -107,7 +108,9 @@ func (p *Parser) Parse(content []byte, path string) (*Post, error) {
 		Slug:        slug,
 		Description: fm.Description,
 		Tags:        fm.Tags,
-		Draft:       fm.Draft,
+		Keywords:    strings.Join(fm.Tags, ", "),
+
+		Draft: fm.Draft,
 		// #nosec G203 -- HTML output from goldmark md parser, not from user input
 		Content:    template.HTML(buf.String()),
 		RawContent: string(markdown),

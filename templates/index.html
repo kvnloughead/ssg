@@ -1,29 +1,30 @@
-{{define "content"}}
+{{ define "content" }}
 <div class="posts-list">
   <h2>Recent Posts</h2>
-
-  {{if .Posts}} {{range .Posts}}
+  {{ if .Posts }} {{ range .Posts }}
   <article class="post-preview">
-    <h3><a href="/posts/{{.Slug}}.html">{{.Title}}</a></h3>
+    <h3>
+      <a href="/posts/{{.Slug}}.html">{{.Title}}</a>
+    </h3>
     <time datetime='{{.Date.Format "2006-01-02"}}'>
       {{.Date.Format "January 2, 2006"}}
     </time>
-    {{if .Description}}
+    {{ if .Description }}
     <p>{{.Description}}</p>
-    {{end}}
+    {{ end }}
     <!--  -->
-    {{if .Tags}}
+    {{ if .Tags }}
     <div class="tags">
-      {{range .Tags}}
+      {{ range .Tags }}
       <span class="tag">{{.}}</span>
-      {{end}}
+      {{ end }}
     </div>
-    {{end}}
+    {{ end }}
   </article>
-  {{end}}
+  {{ end }}
   <!--  -->
-  {{else}}
+  {{ else }}
   <p>No posts yet.</p>
-  {{end}}
+  {{ end }}
 </div>
-{{end}}
+{{ end }}

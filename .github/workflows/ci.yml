@@ -48,6 +48,12 @@ jobs:
       - name: Run security analysis
         run: gosec ./...
 
+      - name: Install djlint
+        run: pip3 install djlint
+
+      - name: Lint HTML templates
+        run: djlint --profile=golang templates/
+
   format:
     name: Format
     runs-on: ubuntu-latest
