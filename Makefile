@@ -112,11 +112,13 @@ lint/install:
 	@if ! command -v djlint > /dev/null; then \
 		echo "Warning: djlint not found. Install with: brew install djlint"; \
 	fi
-
+	@if ! command -v vnu > /dev/null; then \
+		echo "Warning: vnu HTML validator not found. Install with: brew install vnu"; \
+	fi
 
 ## lint: run static analysis
 .PHONY: lint
-lint: lint/templates
+lint: lint/templates validate/html
 	@echo "Running staticcheck..."
 	@staticcheck ./...
 
@@ -132,6 +134,12 @@ security:
 lint/templates:
 	@echo "Linting templates..."
 	@djlint --profile=golang templates/
+
+## validate/html: validate HTML with vnu (ignores trailing slash warnings)
+.PHONY: validate/html
+validate/html: generate
+	@echo "Validating HTML with vnu..."
+	@vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
 
 ## format/templates/check: check templates formatting
 .PHONY: format/templates/check

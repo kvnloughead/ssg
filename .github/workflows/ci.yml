@@ -56,6 +56,9 @@ jobs:
       - name: Lint HTML templates
         run: djlint --profile=golang templates/
 
+      - name: Validate HTML files
+        run: vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
+
   format:
     name: Format
     runs-on: ubuntu-latest
