@@ -128,6 +128,16 @@ main {
   border-radius: 5px;
   overflow-x: auto;
   margin-bottom: 20px;
+  position: relative;
+}
+
+.btn-copy {
+  position: absolute;
+  top: 15xp;
+  right: 15px;
+  padding: 2px 3px;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 700;
 }
 
 .post-content pre code {
