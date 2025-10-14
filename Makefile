@@ -12,7 +12,7 @@ build:
 
 ## deps: install dependencies
 .PHONY: deps
-deps: lint/install
+deps:
 	@echo "Installing dependencies..."
 	@go mod download
 	@go get gopkg.in/yaml.v3
@@ -21,7 +21,7 @@ deps: lint/install
 
 ## init: initialize project (run once)
 .PHONY: init
-init: deps hooks
+init: deps lint/install hooks
 
 # ============================================================
 # SITE GENERATION

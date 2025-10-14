@@ -3,17 +3,18 @@
 [![ci](https://github.com/kvnloughead/ssg/actions/workflows/ci.yml/badge.svg)](https://github.com/kvnloughead/ssg/actions/workflows/ci.yml)
 [![Code style: djLint](https://img.shields.io/badge/html%20style-djLint-blue.svg)](https://github.com/djlint/djlint)
 
-
-
-A minimal, fast static site generator written in Go. Converts markdown posts with YAML frontmatter into a complete static website.
+A minimal, fast static site generator written in Go. Converts markdown posts with YAML frontmatter into a complete static website. JavaScript is only used for progressive enhancements.
 
 ## Features
 
-- **Markdown to HTML** - Parse markdown files with GitHub Flavored Markdown, footnotes, and smart typography
+- **Markdown to HTML** - Parses markdown posts into HTML with [Goldmark](github.com/yuin/goldmark-highlighting/v2)
+  - Syntax highlighting of fenced code blocks
+  - Highlight specific lines of code by adding `{hl_lines=[1,3,5]}` after the fence and language name
+  - Footnotes: `[^1]`
+- **Copy buttons on code blocks** - this feature uses JS
 - **YAML Frontmatter** - Rich metadata support (title, date, description, tags, draft status)
-- **Template Inheritance** - DRY templates using Go's html/template with base layouts
-- **Draft Posts** - Mark posts as drafts to exclude them from the build
-- **Local Dev Server** - Built-in HTTP server for previewing your site
+- **Draft Posts** - Mark posts as drafts to exclude them from the build. Posts are marked as drafts when they are created
+- **Local Dev Server** - Built-in HTTP server for previewing your site locally
 - **Live Reload** - Hot reload support with Air (optional)
 - **Fast Builds** - Efficient single-binary executable with no external dependencies
 
@@ -23,51 +24,42 @@ A minimal, fast static site generator written in Go. Converts markdown posts wit
 
 - Go 1.21 or higher
 
-### Build from source
+### Quick Start
+
+Fork the repo and follow these steps:
 
 ```bash
+# Clone the forked repo
 git clone https://github.com/yourusername/ssg.git
 cd ssg
-make build
-```
 
-The binary will be created at `bin/ssg`.
+# Install dependencies
+make deps
 
-### Install globally
-
-```bash
-go install github.com/yourusername/ssg/cmd/ssg@latest
-```
-
-## Quick Start
-
-### 1. Initialize your project
-
-```bash
-# Clone or create a new directory
-mkdir my-blog && cd my-blog
-
-# Create the required directories
-mkdir -p content/posts templates static/css
+# Recommended: install linting dependencies and pre-push hook
+make init
 
 # Create a config file
 cat > config.yaml << EOF
-title: My Blog
-description: A blog built with SSG
+title: Your Blog Title
+description: An SSG built with ssg
 baseUrl: https://yourblog.com
 author: Your Name
-keywords: Programming, Technology
+keywords: Some, Keywords
 EOF
 ```
 
-### 2. Create templates
+The following templates are provided:
 
-See `templates/` directory for examples. You need at minimum:
 - `base.html` - Main layout
 - `index.html` - Home page (posts list)
 - `post.html` - Individual post page
 
+Adjust them and the CSS as desired.
+
 ### 3. Create your first post
+
+Standard markdown features are parsed. The welcome post in `content/posts` shows
 
 ```bash
 ssg new --title "My First Post"
@@ -106,39 +98,23 @@ Visit `http://localhost:8080` to see your site!
 
 ### Commands
 
-```bash
-ssg build [flags]    # Build the static site
-ssg serve [flags]    # Serve the site locally
-ssg new [flags]      # Create a new post
-```
-
-### Build Command
+The binary has three commands: `build`, `serve`, and `new`. You can run them all with `make`:
 
 ```bash
-ssg build --output public --config config.yaml
+make build
+make serve
+make new TITLE="My Title"
 ```
 
-**Flags:**
-- `--output` - Output directory (default: `public`)
-- `--config` - Config file path (default: `config.yaml`)
-
-### Serve Command
+You can also run them like so:
 
 ```bash
-ssg serve --port 8080
+go run ./cmd/ssg build [flags]               # Build the static site
+go run ./cmd/ssg serve [flags]               # Serve the site locally
+go run ./cmd/ssg new --title "My Title"      # Create a new post
 ```
 
-**Flags:**
-- `--port` - Port to serve on (default: `8080`)
-
-### New Command
-
-```bash
-ssg new --title "My Post Title"
-```
-
-**Flags:**
-- `--title` - Post title (required)
+Run `make help` or `go run ./cmd/ssg` for more info on the commands and flags.
 
 ## Project Structure
 
@@ -154,8 +130,7 @@ ssg new --title "My Post Title"
 │       └── ssg.go            # Site generation logic
 ├── content/
 │   └── posts/                # Your markdown posts
-│       ├── 2024-01-15-first-post.md
-│       └── 2024-01-16-second-post.md
+│       └── 2024-01-15-welcome.md
 ├── templates/                # HTML templates
 │   ├── base.html             # Base layout
 │   ├── index.html            # Home page
@@ -163,10 +138,12 @@ ssg new --title "My Post Title"
 ├── static/                   # Static assets
 │   ├── css/
 │   │   └── style.css
-│   └── images/
+│   ├── images/
+│   └── js/
+|       └── scripts...
 ├── public/                   # Generated site (output)
 ├── config.yaml               # Site configuration
-└── Makefile                  # Build automation
+└── Makefile                  # Build automation and convenience targets
 ```
 
 ## Configuration
@@ -195,45 +172,7 @@ draft: false                   # Optional (default: false)
 ---
 ```
 
-## Templates
-
-Templates use Go's `html/template` syntax with inheritance:
-
-### base.html
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>{{.Title}} | {{.Site.Title}}</title>
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <header>
-      <h1><a href="/">{{.Site.Title}}</a></h1>
-    </header>
-    <main>{{template "content" .}}</main>
-    <footer>© {{.Site.Author}}</footer>
-  </body>
-</html>
-```
-
-### index.html
-
-```html
-{{define "content"}}
-<div class="posts-list">
-  {{range .Posts}}
-  <article>
-    <h2><a href="/posts/{{.Slug}}.html">{{.Title}}</a></h2>
-    <time>{{.Date.Format "January 2, 2006"}}</time>
-  </article>
-  {{end}}
-</div>
-{{end}}
-```
-
-### Template Data
+## Template Data
 
 Templates have access to:
 
@@ -246,78 +185,27 @@ type PageData struct {
 }
 ```
 
-## Development
+## CI Pipeline
 
-### Make Commands
+The `Makefile` provides targets for:
 
-```bash
-make build                    # Build the binary
-make generate                 # Generate the site
-make serve                    # Serve the site
-make test                     # Run tests
-make test/cover              # Run tests with coverage
-make lint                    # Run linters
-make format                  # Format code
-make ci/local                # Run full CI pipeline locally
+- linting Go code with staticcheck
+- security checking Go code with gosec
+- linting html tempaltes with djlint
+- validating HTML with vnu
+- formatting Go code and Go templates
+- running custom Go tests
+
+The easiest way to interact with these are with the `ci/*` targets:
+
+```
+ci/test                  run the test job like CI
+ci/lint                  run the lint job like CI (static analysis + security)
+ci/format                run the format job like CI
+ci/local                 run full CI pipeline locally
 ```
 
-### Live Reload with Air
-
-For development with automatic rebuilding:
-
-```bash
-make run/air
-```
-
-This watches for changes and automatically rebuilds the site.
-
-### Linting Templates
-
-```bash
-make lint/templates          # Lint templates with djlint
-make format/templates        # Format templates with djlint
-```
-
-## Architecture
-
-### Package Overview
-
-- **`cmd/ssg`** - CLI application entry point
-- **`internal/parser`** - Markdown + frontmatter parsing (reusable, no deps on other packages)
-- **`internal/ssg`** - Site generation orchestration (uses parser, handles rendering and file I/O)
-
-### Build Flow
-
-1. Load `config.yaml`
-2. Parse all markdown files in `content/posts/` → `parser.Post` structs
-3. Filter out drafts, sort by date
-4. Load templates from `templates/`
-5. Render `index.html` with all posts
-6. Render individual post pages
-7. Copy static assets to output directory
-
-### Template Inheritance
-
-Templates use a base + content pattern:
-
-1. `base.html` provides layout with `{{template "content" .}}`
-2. `index.html` and `post.html` define `{{define "content"}}` blocks
-3. At render time, base is cloned and content template is parsed into it
-4. Result is a complete page with shared layout
-
-## Testing
-
-```bash
-# Run all tests
-make test
-
-# Run with coverage
-make test/cover
-
-# Run specific package
-go test ./internal/parser
-go test ./internal/ssg
-```
+If the `pre-push` hook is enabled, `ci/local` is run before pushes are allowed. A GitHub action workflow replicating the local pipeline is run when merging or pushing into main.
 
 ## Deployment
 
@@ -348,27 +236,6 @@ git push -f git@github.com:username/repo.git main:gh-pages
 ### Any Static Host
 
 Just upload the contents of `public/` to your web server.
-
-## Contributing
-
-Contributions welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow the patterns in `CLAUDE.md`
-- Add tests for new functionality
-- Update documentation
-- Run `make ci/local` before submitting
-
-## License
-
-MIT License - see LICENSE file for details
 
 ## Acknowledgments
 
