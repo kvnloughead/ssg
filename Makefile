@@ -71,11 +71,31 @@ ci/setup: deps
 	@echo "Installing linting tools (staticcheck and gosec)..."
 	@go install honnef.co/go/tools/cmd/staticcheck@latest
 	@go install github.com/securego/gosec/v2/cmd/gosec@latest
-	@if ! command -v djlint > /dev/null; then \
-		echo "Warning: djlint not found. Install with: brew install djlint"; \
-	fi
-	@if ! command -v vnu > /dev/null; then \
-		echo "Warning: vnu HTML validator not found. Install with: brew install vnu"; \
+	@echo "Installing platform-specific tools..."
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		if ! command -v act > /dev/null; then \
+			echo "Installing act..."; \
+			brew install act; \
+		fi; \
+		if ! command -v djlint > /dev/null; then \
+			echo "Installing djlint..."; \
+			brew install djlint; \
+		fi; \
+		if ! command -v vnu > /dev/null; then \
+			echo "Installing vnu..."; \
+			brew install vnu; \
+		fi; \
+	elif [ "$$(uname)" = "Linux" ]; then \
+		if ! command -v djlint > /dev/null; then \
+			echo "Installing djlint via pip..."; \
+			pip install djlint || pip3 install djlint; \
+		fi; \
+		if ! command -v vnu > /dev/null; then \
+			echo "Installing vnu via npm..."; \
+			npm install -g vnu-jar; \
+		fi; \
+	else \
+		echo "Warning: Unsupported platform. Please install djlint and vnu manually."; \
 	fi
 
 ## ci/test: run tests with coverage like CI
@@ -115,7 +135,7 @@ ci/format:
 		fi; \
 	fi
 	@echo "Checking template formatting..."
-	@djlint --profile=golang --indent 2 --reformat templates/
+	@djlint --profile=golang --indent 2 --check templates/
 
 ## ci/local: run full CI pipeline locally
 .PHONY: ci/local
@@ -127,9 +147,9 @@ ci/local: ci/test ci/lint ci/validate ci/format
 # ============================================================
 
 ## fix: auto-fix formatting issues
-.PHONY: fix
+.PHONY: format/fix
 fix:
-	@echo "Formatting Go code..."
+	@echo "Formatting Go code and templates..."
 	@go fmt ./...
 	@echo "Formatting templates..."
 	@djlint --profile=golang --reformat templates/

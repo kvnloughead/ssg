@@ -1,11 +1,6 @@
 name: ci
 
-on:
-  pull_request:
-    branches: [main]
-
-  push:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
   test:
@@ -13,72 +8,85 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: "1.25.1"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Run tests with coverage
-        run: go test -cover ./...
+      - name: Setup CI dependencies
+        run: make ci/setup
+
+      - name: Run tests
+        run: make ci/test
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: "1.25.1"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+      - name: Setup CI dependencies
+        run: make ci/setup
 
-      - name: Run staticcheck
-        run: staticcheck ./...
+      - name: Run linting
+        run: make ci/lint
 
-      - name: Install gosec
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+  validate:
+    name: Validate HTML
+    runs-on: ubuntu-latest
 
-      # This is a CLI that interacts with the user's local files, so G304 is excluded.
-      - name: Run security analysis
-        run: gosec -exclude=G304 ./...
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Install djlint
-        run: pip3 install djlint
+      - name: Setup CI dependencies
+        run: make ci/setup
 
-      - name: Lint HTML templates
-        run: djlint --profile=golang templates/
-
-      - name: Validate HTML files
-        run: vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
+      - name: Validate HTML
+        run: make ci/validate
 
   format:
     name: Format
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: "1.25.1"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Check Go formatting
-        run: |
-          files=$(find . -name "*.go" -not -name "*_templ.go" -not -path "./vendor/*")
-          if [ -n "$files" ]; then
-            unformatted=$(gofmt -l $files)
-            if [ -n "$unformatted" ]; then
-              echo "Unformatted files: $unformatted"
-              exit 1
-            fi
-          fi
+      - name: Setup CI dependencies
+        run: make ci/setup
+
+      - name: Check formatting
+        run: make ci/format
