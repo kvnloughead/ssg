@@ -4,16 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{.Title}} | {{.Site.Title}}</title>
-    <meta
-      name="description"
-      content="{{ if .Post }}{{.Post.Description}}{{ else }}{{.Site.Description}}{{ end }}"
-    />
-    <meta
-      name="keywords"
-      content="{{ if .Post }}{{.Post.Keywords}}{{ else }}{{.Site.Keywords}}{{ end }}"
-    />
+    <meta name="description"
+          content="{{ if .Post }}{{.Post.Description}}{{ else }}{{.Site.Description}}{{ end }}" />
+    <meta name="keywords"
+          content="{{ if .Post }}{{.Post.Keywords}}{{ else }}{{.Site.Keywords}}{{ end }}" />
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="/js/copy-button.js" defer></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="/static/js/copy-button.js" defer></script>
   </head>
   <body>
     <header>
@@ -24,7 +21,9 @@
         <p>{{.Site.Description}}</p>
       </nav>
     </header>
-    <main>{{ template "content" . }}</main>
+    <main>
+      {{ template "content" . }}
+    </main>
     <footer>
       <p>© {{.Site.Author}} | Built with SSG</p>
     </footer>
