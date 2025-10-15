@@ -18,10 +18,9 @@ deps:
 	@go get gopkg.in/yaml.v3
 	@go get github.com/yuin/goldmark
 
-
 ## init: initialize project (run once)
 .PHONY: init
-init: deps lint/install hooks
+init: ci/setup hooks
 
 # ============================================================
 # SITE GENERATION
@@ -49,7 +48,7 @@ ifndef TITLE
 endif
 	@./bin/ssg new --title "$(TITLE)"
 
-## dev: build binary, generate site, and serve (no watch)
+## run/dev: build binary, generate site, and serve (no watch)
 .PHONY: run/dev
 run/dev: build generate serve
 
@@ -62,50 +61,13 @@ run/air:
 	fi
 	@air
 
-
 # ============================================================
-# TESTING AND FORMATING
-# ============================================================
-
-## test: run tests
-.PHONY: test
-test:
-	@echo "Running tests..."
-	@go test ./...
-
-## test/cover: run tests with coverage
-.PHONY: test/cover
-test/cover:
-	@echo "Running tests with coverage..."
-	@go test -cover ./...
-
-## format: format code
-.PHONY: format
-format:
-	@echo "Formatting Go code..."
-	@go fmt ./...
-
-## format/check: check if code is properly formatted
-.PHONY: format/check
-format/check:
-	@echo "Checking Go formatting..."
-	@files=$$(find . -name "*.go" -not -path "./vendor/*"); \
-	if [ -n "$$files" ]; then \
-		unformatted=$$(gofmt -l $$files); \
-		if [ -n "$$unformatted" ]; then \
-			echo "Code is not properly formatted. Run 'make format' to fix."; \
-			echo "Unformatted files: $$unformatted"; \
-			exit 1; \
-		fi; \
-	fi
-
-# ============================================================
-# LINTING AND SECURITY
+# CONTINUOUS INTEGRATION
 # ============================================================
 
-## lint/install: install linting tools
-.PHONY: lint/install
-lint/install:
+## ci/setup: install all CI dependencies
+.PHONY: ci/setup
+ci/setup: deps
 	@echo "Installing linting tools (staticcheck and gosec)..."
 	@go install honnef.co/go/tools/cmd/staticcheck@latest
 	@go install github.com/securego/gosec/v2/cmd/gosec@latest
@@ -116,67 +78,61 @@ lint/install:
 		echo "Warning: vnu HTML validator not found. Install with: brew install vnu"; \
 	fi
 
-## lint: run static analysis
-.PHONY: lint
-lint: lint/templates validate/html
-	@echo "Running staticcheck..."
-	@staticcheck ./...
+## ci/test: run tests with coverage like CI
+.PHONY: ci/test
+ci/test:
+	@echo "Running tests with coverage..."
+	@go test -cover ./...
 
-## security: run security analysis. This is a CLI that interacts with the user's local files, so G304 is excluded.
-.PHONY: security
-security:
-	@echo "Running gosec security analysis..."
-	@echo "This is a CLI the interacts with the users local files, so G304 is excluded."
-	@gosec -exclude=G304 ./...
-
-## lint/templates: lint HTML templates with djlint
-.PHONY: lint/templates
-lint/templates:
+## ci/lint: run linting like CI (static analysis + security + templates + HTML validation)
+.PHONY: ci/lint
+ci/lint:
 	@echo "Linting templates..."
 	@djlint --profile=golang templates/
+	@echo "Running staticcheck..."
+	@staticcheck ./...
+	@echo "Running gosec security analysis..."
+	@echo "This is a CLI that interacts with the user's local files, so G304 is excluded."
+	@gosec -exclude=G304 ./...
 
-## validate/html: validate HTML with vnu (ignores trailing slash warnings)
-.PHONY: validate/html
-validate/html: generate
+## ci/validate: validate generated HTML with vnu
+.PHONY: ci/validate
+ci/validate: generate
 	@echo "Validating HTML with vnu..."
 	@vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
 
-## format/templates/check: check templates formatting
-.PHONY: format/templates/check
-format/templates/check:
-	@echo "Checking template formatting..."
-	@djlint --profile=golang --check templates/
-
-## format/templates: format HTML templates with djlint
-.PHONY: format/templates
-format/templates:
-	@echo "Formatting templates..."
-	@djlint --profile=golang --reformat templates/
-
-# ============================================================
-# CONTINUOUS INTEGRATION
-# ============================================================
-
-## ci/test: run the test job like CI
-.PHONY: ci/test
-ci/test: test/cover
-
-## ci/lint: run the lint job like CI (static analysis + security)
-.PHONY: ci/lint
-ci/lint: lint security
-
-## ci/format: run the format job like CI
+## ci/format: check formatting like CI
 .PHONY: ci/format
-ci/format: format/check
+ci/format:
+	@echo "Checking Go formatting..."
+	@files=$$(find . -name "*.go" -not -path "./vendor/*"); \
+	if [ -n "$$files" ]; then \
+		unformatted=$$(gofmt -l $$files); \
+		if [ -n "$$unformatted" ]; then \
+			echo "Code is not properly formatted. Run 'make fix' to fix."; \
+			echo "Unformatted files: $$unformatted"; \
+			exit 1; \
+		fi; \
+	fi
+	@echo "Checking template formatting..."
+	@djlint --profile=golang --indent 2 --reformat templates/
 
 ## ci/local: run full CI pipeline locally
 .PHONY: ci/local
-ci/local: ci/test ci/lint ci/format
+ci/local: ci/test ci/lint ci/validate ci/format
 	@echo "✅ All CI checks passed!"
 
-## ci/setup: install all CI dependencies
-.PHONY: ci/setup
-ci/setup: deps lint/install
+# ============================================================
+# FORMATTING AND FIXING
+# ============================================================
+
+## fix: auto-fix formatting issues
+.PHONY: fix
+fix:
+	@echo "Formatting Go code..."
+	@go fmt ./...
+	@echo "Formatting templates..."
+	@djlint --profile=golang --reformat templates/
 
 # ============================================================
 # GIT HOOKS

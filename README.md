@@ -196,7 +196,7 @@ The `Makefile` provides targets for:
 - formatting Go code and Go templates
 - running custom Go tests
 
-The easiest way to interact with these are with the `ci/*` targets:
+CI targets:
 
 ```
 ci/test                  run the test job like CI
