@@ -52,7 +52,7 @@ EOF
 The following templates are provided:
 
 - `base.html` - Main layout
-- `index.html` - Home page (posts list)
+- `posts.html` - Home page (posts list)
 - `post.html` - Individual post page
 
 Adjust them and the CSS as desired.
@@ -133,7 +133,7 @@ Run `make help` or `go run ./cmd/ssg` for more info on the commands and flags.
 │       └── 2024-01-15-welcome.md
 ├── templates/                # HTML templates
 │   ├── base.html             # Base layout
-│   ├── index.html            # Home page
+│   ├── posts.html            # Home page
 │   └── post.html             # Post page
 ├── static/                   # Static assets
 │   ├── css/
@@ -148,15 +148,7 @@ Run `make help` or `go run ./cmd/ssg` for more info on the commands and flags.
 
 ## Configuration
 
-Edit `config.yaml`:
-
-```yaml
-title: My Blog
-description: A blog about programming and technology
-baseUrl: https://yourblog.com
-author: Your Name
-keywords: Programming, Golang, Technology
-```
+Edit [config.yaml](config.yaml).
 
 ## Frontmatter
 
@@ -165,9 +157,9 @@ Posts support the following frontmatter fields:
 ```yaml
 ---
 title: Post Title              # Required
-date: 2024-01-15T10:00:00Z    # Required (RFC3339 format)
+date: 2024-01-15T10:00:00Z     # Required (RFC3339 format)
 description: Post description  # Optional
-tags: [tag1, tag2]            # Optional
+tags: [tag1, tag2]             # Optional
 draft: false                   # Optional (default: false)
 ---
 ```
@@ -180,7 +172,7 @@ Templates have access to:
 type PageData struct {
     Site  SiteConfig        // Site config (title, author, etc.)
     Post  *parser.Post      // Current post (on post pages)
-    Posts []*parser.Post    // All posts (on index page)
+    Posts []*parser.Post    // All posts
     Title string            // Page title
 }
 ```

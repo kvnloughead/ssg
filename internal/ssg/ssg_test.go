@@ -80,20 +80,20 @@ Draft content.
 	baseTemplate := `<!DOCTYPE html>
 <html>
 <head><title>{{.Title}}</title></head>
-<body>{{template "content" .}}</body>
+<body>{{template "posts" .}}</body>
 </html>`
 	if err := os.WriteFile(filepath.Join(templatesDir, "base.html"), []byte(baseTemplate), 0600); err != nil {
 		t.Fatal(err)
 	}
 
-	indexTemplate := `{{define "content"}}
+	postsTemplate := `{{define "posts"}}
 <div>{{range .Posts}}<article>{{.Title}}</article>{{end}}</div>
 {{end}}`
-	if err := os.WriteFile(filepath.Join(templatesDir, "index.html"), []byte(indexTemplate), 0600); err != nil {
+	if err := os.WriteFile(filepath.Join(templatesDir, "posts.html"), []byte(postsTemplate), 0600); err != nil {
 		t.Fatal(err)
 	}
 
-	postTemplate := `{{define "content"}}
+	postTemplate := `{{define "posts"}}
 <article>{{.Post.Title}}</article>
 {{end}}`
 	if err := os.WriteFile(filepath.Join(templatesDir, "post.html"), []byte(postTemplate), 0600); err != nil {
@@ -521,13 +521,13 @@ func TestRenderer_Integration(t *testing.T) {
 	baseTemplate := `<!DOCTYPE html>
 <html>
 <head><title>{{.Title}}</title></head>
-<body>{{template "content" .}}</body>
+<body>{{template "posts" .}}</body>
 </html>`
 	if err := os.WriteFile(filepath.Join(templatesDir, "base.html"), []byte(baseTemplate), 0600); err != nil {
 		t.Fatal(err)
 	}
 
-	postTemplate := `{{define "content"}}
+	postTemplate := `{{define "posts"}}
 <article><h1>{{.Post.Title}}</h1><div>{{.Post.Content}}</div></article>
 {{end}}`
 	if err := os.WriteFile(filepath.Join(templatesDir, "post.html"), []byte(postTemplate), 0600); err != nil {

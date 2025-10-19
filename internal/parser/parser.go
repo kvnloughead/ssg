@@ -53,6 +53,7 @@ type Parser struct {
 //   - Auto-generate heading ID's
 //   - newlines -> <br>
 //   - Syntax highlighting via https://github.com/alecthomas/chroma
+//   - Unsafe HTML rendering from within Markdown (don't use with user provided content)
 func New() *Parser {
 	md := goldmark.New(
 		goldmark.WithExtensions(
@@ -73,6 +74,7 @@ func New() *Parser {
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(), // Convert newlines to <br>
 			html.WithXHTML(),     // Use more strict XML-style tags
+			html.WithUnsafe(),
 		),
 	)
 

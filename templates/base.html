@@ -4,28 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{.Title}} | {{.Site.Title}}</title>
-    <meta name="description"
-          content="{{ if .Post }}{{.Post.Description}}{{ else }}{{.Site.Description}}{{ end }}" />
-    <meta name="keywords"
-          content="{{ if .Post }}{{.Post.Keywords}}{{ else }}{{.Site.Keywords}}{{ end }}" />
+    <meta
+      name="description"
+      content="{{ if .Post }}{{.Post.Description}}{{ else }}{{.Site.Description}}{{ end }}"
+    />
+    <meta
+      name="keywords"
+      content="{{ if .Post }}{{.Post.Keywords}}{{ else }}{{.Site.Keywords}}{{ end }}"
+    />
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="https://unpkg.com/alpinejs" defer></script>
-    <script src="/static/js/copy-button.js" defer></script>
+    <script src="/js/copy-button.js" defer></script>
   </head>
   <body>
-    <header>
-      <nav>
-        <h1>
-          <a href="/">{{.Site.Title}}</a>
-        </h1>
-        <p>{{.Site.Description}}</p>
-      </nav>
-    </header>
-    <main>
-      {{ template "content" . }}
-    </main>
-    <footer>
-      <p>© {{.Site.Author}} | Built with SSG</p>
-    </footer>
+    <div class="content">
+      <header>
+        <nav>
+          <a href="/">Home</a>
+          <form action="" class="search">
+            <input type="text" placeholder="Enter search term" />
+            <button type="submit">Search</button>
+          </form>
+        </nav>
+      </header>
+      <main>{{ template "posts" . }}</main>
+      <footer>
+        <p>© {{.Site.Author}} | Built with SSG</p>
+      </footer>
+    </div>
   </body>
 </html>

@@ -1,0 +1,36 @@
+{{ define "posts" }}
+<div class="posts">
+  <h1>{{ .Site.Title }}</h1>
+  <p>{{ .Site.Description }}</p>
+  {{ if .Posts }}
+  <ul class="posts-list">
+    {{ range .Posts }}
+    <li class="post-preview">
+      <article>
+        <h3>
+          <a href="/posts/{{.Slug}}.html">{{.Title}}</a>
+        </h3>
+        <time datetime='{{.Date.Format "2006-01-02"}}'>
+          {{.Date.Format "January 2, 2006"}}
+        </time>
+        {{ if .Description }}
+        <p>{{.Description}}</p>
+        {{ end }}
+        <!--  -->
+        {{ if .Tags }}
+        <div class="tags">
+          {{ range .Tags }}
+          <span class="tag">{{.}}</span>
+          {{ end }}
+        </div>
+        {{ end }}
+      </article>
+    </li>
+    {{ end }}
+  </ul>
+  <!--  -->
+  {{ else }}
+  <p>No posts yet.</p>
+  {{ end }}
+</div>
+{{ end }}
