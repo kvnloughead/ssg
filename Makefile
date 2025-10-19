@@ -121,7 +121,7 @@ ci/validate: generate
 	@echo "Validating HTML with vnu..."
 	@vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
 
-## ci/format: check formatting of Go code
+## ci/format: check formatting like
 .PHONY: ci/format
 ci/format:
 	@echo "Checking Go formatting..."
