@@ -1,5 +1,5 @@
-title: My Blog
-description: A blog built with a custom Go static site generator
-baseUrl: https://yourblog.com
+title: Static Site Generator
+description: An SSG written in Go. Write your content in markdown and render it as HTML.
+baseUrl: https://yoursite.com
 author: Your Name
 keywords: Programming, Golang

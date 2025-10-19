@@ -148,15 +148,7 @@ Run `make help` or `go run ./cmd/ssg` for more info on the commands and flags.
 
 ## Configuration
 
-Edit `config.yaml`:
-
-```yaml
-title: My Blog
-description: A blog about programming and technology
-baseUrl: https://yourblog.com
-author: Your Name
-keywords: Programming, Golang, Technology
-```
+Edit [config.yaml](config.yaml).
 
 ## Frontmatter
 
@@ -165,9 +157,9 @@ Posts support the following frontmatter fields:
 ```yaml
 ---
 title: Post Title              # Required
-date: 2024-01-15T10:00:00Z    # Required (RFC3339 format)
+date: 2024-01-15T10:00:00Z     # Required (RFC3339 format)
 description: Post description  # Optional
-tags: [tag1, tag2]            # Optional
+tags: [tag1, tag2]             # Optional
 draft: false                   # Optional (default: false)
 ---
 ```
