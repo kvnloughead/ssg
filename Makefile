@@ -121,7 +121,7 @@ ci/validate: generate
 	@echo "Validating HTML with vnu..."
 	@vnu --skip-non-html public/ 2>&1 | grep -v "Trailing slash on void elements" || true
 
-## ci/format: check formatting like CI
+## ci/format: check formatting of Go code
 .PHONY: ci/format
 ci/format:
 	@echo "Checking Go formatting..."
@@ -134,25 +134,11 @@ ci/format:
 			exit 1; \
 		fi; \
 	fi
-	@echo "Checking template formatting..."
-	@djlint --profile=golang --indent 2 --check templates/
 
 ## ci/local: run full CI pipeline locally
 .PHONY: ci/local
 ci/local: ci/test ci/lint ci/validate ci/format
 	@echo "✅ All CI checks passed!"
-
-# ============================================================
-# FORMATTING AND FIXING
-# ============================================================
-
-## fix: auto-fix formatting issues
-.PHONY: format/fix
-fix:
-	@echo "Formatting Go code and templates..."
-	@go fmt ./...
-	@echo "Formatting templates..."
-	@djlint --profile=golang --reformat templates/
 
 # ============================================================
 # GIT HOOKS
