@@ -16,17 +16,19 @@
     <script src="/js/copy-button.js" defer></script>
   </head>
   <body>
-    <header>
-      <nav>
-        <h1>
-          <a href="/">{{.Site.Title}}</a>
-        </h1>
-        <p>{{.Site.Description}}</p>
-      </nav>
-    </header>
-    <main>{{ template "content" . }}</main>
-    <footer>
-      <p>© {{.Site.Author}} | Built with SSG</p>
-    </footer>
+    <div class="posts">
+      <header>
+        <nav>
+          <h1>
+            <a href="/">{{.Site.Title}}</a>
+          </h1>
+          <p>{{.Site.Description}}</p>
+        </nav>
+      </header>
+      <main>{{ template "posts" . }}</main>
+      <footer>
+        <p>© {{.Site.Author}} | Built with SSG</p>
+      </footer>
+    </div>
   </body>
 </html>

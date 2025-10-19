@@ -47,8 +47,8 @@ type PageData struct {
 //  3. Parses all markdown files in content/posts/ using parser.ParseFile
 //  4. Filters out draft posts and sorts by date (newest first)
 //  5. Creates a renderer instance with templates from templates/
-//  6. Renders index.html with the list of posts using renderer.RenderIndex
-//  7. Renders individual post pages using renderer.RenderPost
+//  6. Renders posts.html with the list of posts using renderer.renderIndex
+//  7. Renders individual post pages using renderer.renderPost
 //  8. Copies static assets (CSS, images, etc.) to output directory
 //
 // Parameters:
@@ -209,13 +209,13 @@ Write your post here...
 // newRenderer creates a new Renderer with all templates pre-loaded from the template directory.
 //
 // Uses template.ParseGlob to load all *.html files in the directory into a single
-// template set. Each file is named by its filename (e.g., "base.html", "index.html").
+// template set. Each file is named by its filename (e.g., "base.html", "posts.html").
 // Templates can reference each other using {{define}} blocks.
 //
 // Expected template structure:
-//   - base.html: Main layout with {{template "content" .}} placeholder
-//   - index.html: Defines {{define "content"}} for the posts list page
-//   - post.html: Defines {{define "content"}} for individual post pages
+//   - base.html: Main layout with {{template "posts" .}} placeholder
+//   - posts.html: Defines {{define "posts"}} for the posts list page
+//   - post.html: Defines {{define "posts"}} for individual post pages
 //
 // Parameters:
 //   - templateDir: Directory containing HTML templates (e.g., "templates")
@@ -235,7 +235,7 @@ func newRenderer(templateDir string) (*Renderer, error) {
 //
 // Called by Build for each published post. Creates a PageData struct with
 // the post content and site config, then calls renderToFile with "post.html" to
-// render base.html + post.html's {{define "content"}} block.
+// render base.html + post.html's {{define "posts"}} block.
 //
 // Parameters:
 //   - post: Parsed post struct from parser.ParseFile containing title, content, etc.
@@ -255,14 +255,14 @@ func (r *Renderer) renderPost(post *parser.Post, config SiteConfig, outputPath s
 
 // renderIndex renders the home page with a list of all published posts.
 //
-// Called by Build to create the main index.html page. Creates a
+// Called by Build to create the main posts.html page. Creates a
 // PageData struct with all posts and site config, then calls renderToFile with
-// "index.html" to render base.html + index.html's {{define "content"}} block.
+// "posts.html" to render base.html + posts.html's {{define "posts"}} block.
 //
 // Parameters:
 //   - posts: Slice of all published posts (already filtered and sorted by builder)
 //   - config: Site configuration (title, author, etc.) for template rendering
-//   - outputPath: Where to write the HTML file (e.g., "public/index.html")
+//   - outputPath: Where to write the HTML file (e.g., "public/posts.html")
 //
 // Returns an error if rendering or file writing fails.
 func (r *Renderer) renderIndex(posts []*parser.Post, config SiteConfig, outputPath string) error {
@@ -272,16 +272,16 @@ func (r *Renderer) renderIndex(posts []*parser.Post, config SiteConfig, outputPa
 		Title: config.Title,
 	}
 
-	return r.renderToFile("index.html", data, outputPath)
+	return r.renderToFile("posts.html", data, outputPath)
 }
 
 // renderToFile renders a page by combining base.html with a content template.
 //
 // This is where the template inheritance pattern is implemented:
 //  1. Clones the pre-loaded base.html template (for a fresh copy)
-//  2. Parses the content template file (index.html or post.html) which contains
-//     a {{define "content"}} block
-//  3. Executes base.html, which calls {{template "content" .}} to inject the
+//  2. Parses the content template file (posts.html or post.html) which contains
+//     a {{define "posts"}} block
+//  3. Executes base.html, which calls {{template "posts" .}} to inject the
 //     appropriate content block
 //  4. Writes the final HTML to the output file
 //
@@ -289,7 +289,7 @@ func (r *Renderer) renderIndex(posts []*parser.Post, config SiteConfig, outputPa
 // while having different main content.
 //
 // Parameters:
-//   - contentTemplate: Which content template to use ("index.html" or "post.html")
+//   - contentTemplate: Which content template to use ("posts.html" or "post.html")
 //   - data: PageData struct containing site config and post(s) for template variables
 //   - outputPath: Where to write the rendered HTML file
 //
