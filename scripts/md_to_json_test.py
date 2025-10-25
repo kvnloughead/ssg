@@ -168,11 +168,12 @@ This is a test post."""
 
         result = process_markdown_file(test_file)
 
-        self.assertEqual(result["file"], "test.md")
-        self.assertEqual(result["frontmatter"]["title"], "Test Post")
-        self.assertEqual(result["frontmatter"]["tags"], ["test", "markdown"])
-        self.assertFalse(result["frontmatter"]["draft"])
-        self.assertIn("# Hello World", result["content"])
+        # Check flattened structure
+        self.assertEqual(result["title"], "Test Post")
+        self.assertEqual(result["tags"], "test markdown")  # Space-separated string
+        self.assertFalse(result["draft"])
+        self.assertIn("# Hello World", result["body"])  # Content is in 'body'
+        self.assertEqual(result["url"], "/posts/test")  # URL generated from filename
 
     def test_process_file_without_frontmatter(self):
         """Test processing a markdown file without frontmatter"""
@@ -184,9 +185,9 @@ This is a test post."""
 
         result = process_markdown_file(test_file)
 
-        self.assertEqual(result["file"], "plain.md")
-        self.assertEqual(result["frontmatter"], {})
-        self.assertEqual(result["content"], content)
+        # Should only have body and url fields
+        self.assertEqual(result["body"], content)
+        self.assertEqual(result["url"], "/posts/plain")
 
     def test_process_utf8_content(self):
         """Test processing markdown with UTF-8 characters"""
@@ -202,9 +203,10 @@ Unicode characters: 你好世界 🚀 café"""
 
         result = process_markdown_file(test_file)
 
-        self.assertIn("你好世界", result["content"])
-        self.assertIn("🚀", result["content"])
-        self.assertIn("café", result["content"])
+        self.assertEqual(result["title"], "UTF-8 Test")
+        self.assertIn("你好世界", result["body"])
+        self.assertIn("🚀", result["body"])
+        self.assertIn("café", result["body"])
 
 
 class TestProcessPostsDirectory(unittest.TestCase):
@@ -264,8 +266,8 @@ Nested content.""")
         # Should find 4 .md files (post1, post2, draft, nested)
         self.assertEqual(len(posts), 4)
 
-        # Extract titles from all posts
-        titles = [post["frontmatter"].get("title") for post in posts]
+        # Extract titles from all posts (now at top level)
+        titles = [post.get("title") for post in posts]
 
         self.assertIn("First Post", titles)
         self.assertIn("Second Post", titles)
@@ -276,18 +278,19 @@ Nested content.""")
         """Test that non-.md files are ignored"""
         posts = process_posts_directory(self.test_dir)
 
-        # readme.txt should not be in the results
-        filenames = [post["file"] for post in posts]
-        self.assertNotIn("readme.txt", filenames)
+        # readme.txt should not be in the results (check URLs instead)
+        urls = [post["url"] for post in posts]
+        self.assertNotIn("/posts/readme.txt", urls)
+        self.assertNotIn("/posts/readme", urls)
 
     def test_process_includes_nested_files(self):
         """Test that nested directories are processed"""
         posts = process_posts_directory(self.test_dir)
 
-        # Find the nested post
-        nested_posts = [p for p in posts if p["file"] == "nested.md"]
+        # Find the nested post by URL
+        nested_posts = [p for p in posts if p["url"] == "/posts/nested"]
         self.assertEqual(len(nested_posts), 1)
-        self.assertEqual(nested_posts[0]["frontmatter"]["title"], "Nested Post")
+        self.assertEqual(nested_posts[0]["title"], "Nested Post")
 
     def test_process_empty_directory(self):
         """Test processing an empty directory"""
@@ -363,6 +366,13 @@ This is the second post.""",
 
         # Verify results
         self.assertEqual(len(results), 2)
+
+        # Check flattened structure
+        first_post = next(p for p in results if p["title"] == "Introduction Post")
+        self.assertEqual(first_post["tags"], "blogging golang")  # Space-separated
+        self.assertEqual(first_post["url"], "/posts/2025-10-19-first-post")
+        self.assertFalse(first_post["draft"])
+        self.assertIn("This is the first post.", first_post["body"])
 
         # Verify JSON serialization works
         json_output = json.dumps(results, indent=2, ensure_ascii=False)

@@ -5,7 +5,7 @@ tmp_dir = "tmp"
   # Build the SSG binary and regenerate the site on changes
   cmd = "go build -o ./tmp/ssg ./cmd/ssg && ./tmp/ssg build"
   bin = "./tmp/ssg serve"
-  include_ext = ["go", "html", "css", "md", "yaml"]
+  include_ext = ["go", "html", "css", "js", "md", "yaml"]
   include_dir = ["cmd", "internal", "templates", "static", "content"]
   exclude_dir = ["tmp", "public", "bin"]
   delay = 1000

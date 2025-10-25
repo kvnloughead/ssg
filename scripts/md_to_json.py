@@ -70,18 +70,30 @@ def process_markdown_file(file_path):
         file_path: Path to the markdown file
 
     Returns:
-        Dictionary containing frontmatter and content
+        Dictionary with flattened frontmatter fields and content
     """
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     frontmatter, markdown_content = parse_frontmatter(content)
 
-    return {
-        "file": os.path.basename(file_path),
-        "frontmatter": frontmatter,
-        "content": markdown_content,
-    }
+    # Start with flattened frontmatter
+    result = dict(frontmatter)
+
+    # Convert tags array to space-separated string if present
+    if "tags" in result and isinstance(result["tags"], list):
+        result["tags"] = " ".join(result["tags"])
+
+    # Add content as 'body' (standard field for tinysearch)
+    result["body"] = markdown_content
+
+    # Generate URL from filename (remove .md extension)
+    # Assumes format like "2025-10-19-post-title.md" -> "/posts/post-title"
+    filename = os.path.basename(file_path)
+    slug = filename.replace(".md", "")
+    result["url"] = f"/posts/{slug}"
+
+    return result
 
 
 def process_posts_directory(posts_dir):

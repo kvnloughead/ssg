@@ -14,16 +14,24 @@
     />
     <link rel="stylesheet" href="/css/style.css" />
     <script src="/js/copy-button.js" defer></script>
+    <script src="/js/tinysearch/index.js" defer></script>
   </head>
   <body>
     <div class="content">
       <header>
         <nav>
           <a href="/">Home</a>
-          <form action="" class="search">
-            <input type="text" placeholder="Enter search term" />
+          <form id="search-form">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Enter your search query..."
+            />
             <button type="submit">Search</button>
           </form>
+
+          <p id="status" class="status">Loading search engine...</p>
+          <p id="results" class="results"></p>
         </nav>
       </header>
       <main>{{ template "posts" . }}</main>

@@ -10,11 +10,11 @@ tmp/
 # Test binary
 *.test
 
-# Output of the go coverage tool
+# Output
 *.out
-
-# Generated site output
 public/
+static/js/tinysearch/fixtures
+static/js/tinysearch/*.wasm
 
 # Dependency directories
 vendor/
