@@ -101,8 +101,16 @@ ci/setup: deps
 ## ci/test: run tests with coverage like CI
 .PHONY: ci/test
 ci/test:
-	@echo "Running tests with coverage..."
+	@echo "Running Go tests with coverage..."
 	@go test -cover ./...
+	@echo "Running script tests..."
+	@$(MAKE) ci/test-scripts
+
+## ci/test-scripts: run Python script tests
+.PHONY: ci/test-scripts
+ci/test-scripts:
+	@echo "Running Python script tests..."
+	@cd scripts && python3 -m unittest discover -p "*_test.py" -v
 
 ## ci/lint: run linting like CI (static analysis + security + templates + HTML validation)
 .PHONY: ci/lint
