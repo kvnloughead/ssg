@@ -9,6 +9,10 @@
 build:
 	@echo "Building SSG..."
 	@go build -o bin/ssg ./cmd/ssg
+	@echo "Compiling search index..."
+	@python3 scripts/md_to_json.py >| static/js/tinysearch/fixtures/index.json
+	@tinysearch --release -m wasm -p static/js/tinysearch/ \
+		static/js/tinysearch/fixtures/index.json
 
 ## deps: install dependencies
 .PHONY: deps

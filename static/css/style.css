@@ -6,8 +6,11 @@
   --text-main: #333;
   --text-light: #666;
   --text-lightest: #999;
+  --text-contrast: #fff;
   --text-link: rgb(9, 105, 218);
   --bg-main: #fff;
+  --bg-tag: #b7b7b780;
+  --bg-button: #24a0ed;
   --border-color: var(--text-main);
   --border-color-light: var(--text-light);
 }
@@ -17,6 +20,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  list-style-type: none;
 }
 
 body {
@@ -42,11 +46,37 @@ header {
   margin-bottom: 30px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
 }
 
 header nav {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 3px 5px;
+  }
+  input {
+    width: 184px;
+    padding: 3px 2px;
+    border-radius: 5px;
+  }
+}
+
+.btn {
+  background-color: var(--bg-button);
+  color: var(--text-contrast);
+  padding: 3px 7px;
+  border: none;
+  border-radius: 5px;
+}
+
+header .search-results {
+  align-self: flex-end;
 }
 
 header a {
@@ -251,7 +281,7 @@ main {
 
 .tag {
   display: inline-block;
-  background: #b7b7b780;
+  background: var(--bg-tag);
   padding: 2px 8px;
   border-radius: 3px;
   font-size: 0.85em;

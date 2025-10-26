@@ -1,6 +1,6 @@
 const searchForm = document.getElementById("search-form");
 const searchInputEl = document.getElementById("search-input");
-const resultsDiv = document.getElementById("results");
+const resultsEl = document.getElementById("results");
 const statusEl = document.getElementById("status");
 
 let wasmModule = null;
@@ -11,7 +11,7 @@ let freeFunction = null;
 async function initializeSearch() {
   try {
     // Fetch from the WASM module and assemble the response
-    const response = await fetch("./js/tinysearch/tinysearch_engine.wasm");
+    const response = await fetch("/js/tinysearch/tinysearch_engine.wasm");
     if (!response.ok) {
       throw new Error(
         `Failed to fetch WASM: ${response.status} ${response.statusText}`
@@ -32,7 +32,6 @@ async function initializeSearch() {
     // Prepare the form, because the search engine ready for queries
     searchForm.addEventListener("submit", performSearch);
     searchForm.disabled = false;
-    statusEl.textContent = "Search engine ready! Try entering a query above.";
     searchInputEl.focus();
   } catch (error) {
     console.error("Failed to initialize search:", error);
@@ -70,19 +69,28 @@ function wasmPtrToString(ptr) {
   return new TextDecoder().decode(bytes);
 }
 
+function handleError(msg) {
+  console.error(`Error: ${msg}`);
+  statusEl.innerHTML = `<p class="error">${msg}</p>`;
+}
+
+function displayNoResults(query, searchTime) {
+  resultsEl.innerHTML = '<div class="no-results">No results found</div>';
+  statusEl.textContent = `No results found for "${query}" (${searchTime}ms)`;
+}
+
 function performSearch(evt) {
   evt.preventDefault();
 
   const query = searchInputEl.value.trim();
 
   if (!wasmModule) {
-    statusEl.innerHTML =
-      '<div class="error">Search engine not initialized</div>';
+    handleError("Search engine not initialized");
     return;
   }
 
   if (!query) {
-    resultsDiv.innerHTML = "";
+    resultsEl.innerHTML = "";
     statusEl.textContent = "Enter a search query to see results.";
     return;
   }
@@ -114,8 +122,7 @@ function performSearch(evt) {
     const searchTime = (endTime - startTime).toFixed(3);
 
     if (resultPtr === 0) {
-      resultsDiv.innerHTML = '<div class="no-results">No results found</div>';
-      statusEl.textContent = `No results found for "${query}" (${searchTime}ms)`;
+      displayNoResults(query, searchTime);
       return;
     }
 
@@ -126,40 +133,40 @@ function performSearch(evt) {
     freeFunction(resultPtr);
 
     if (!resultString) {
-      resultsDiv.innerHTML = '<div class="no-results">No results found</div>';
-      statusEl.textContent = `No results found for "${query}" (${searchTime}ms)`;
+      displayNoResults(query, searchTime);
       return;
     }
 
     const results = JSON.parse(resultString);
 
     if (results.length === 0) {
-      resultsDiv.innerHTML = '<div class="no-results">No results found</div>';
-      statusEl.textContent = `No results found for "${query}" (${searchTime}ms)`;
+      displayNoResults(query, searchTime);
     } else {
       const resultHTML = results
         .map(
           (result) => `
-                        <div class="result-item">
+                        <li class="result-item">
                             <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
-                        </div>
+                        </li>
                     `
         )
         .join("");
 
-      resultsDiv.innerHTML = resultHTML;
+      resultsEl.innerHTML = resultHTML;
       statusEl.textContent = `Found ${results.length} result${
         results.length !== 1 ? "s" : ""
       } for "${query}" (${searchTime}ms)`;
     }
   } catch (error) {
     console.error("Search error:", error);
-    resultsDiv.innerHTML =
+    resultsEl.innerHTML =
       '<div class="error">Search failed. Check console for details.</div>';
     statusEl.innerHTML = `<div class="error">Search failed: ${error.message}</div>`;
   }
 }
 
 // Initialize search engine
-document.getElementById("search-form").disabled = true;
-initializeSearch();
+if (searchForm) {
+  searchForm.disabled = true;
+  initializeSearch();
+}

@@ -1,4 +1,3 @@
 [schema]
 indexed_fields = ["title", "description", "category", "tags"]
-metadata_fields = ["price", "image_url", "brand", "availability"]
-url_field = "product_url"
+metadata_fields = ["url"]

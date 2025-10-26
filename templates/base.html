@@ -21,17 +21,20 @@
       <header>
         <nav>
           <a href="/">Home</a>
-          <form id="search-form">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Enter your search query..."
-            />
-            <button type="submit">Search</button>
-          </form>
-
-          <p id="status" class="status">Loading search engine...</p>
-          <p id="results" class="results"></p>
+          <div>
+            <form id="search-form">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Enter query (full word search)"
+              />
+              <button type="submit" class="btn">Search</button>
+            </form>
+            <div class="search-results">
+              <div id="status" class="status"></div>
+              <div id="results" class="results"></div>
+            </div>
+          </div>
         </nav>
       </header>
       <main>{{ template "body" . }}</main>
