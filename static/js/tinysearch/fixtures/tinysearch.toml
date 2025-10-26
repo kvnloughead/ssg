@@ -1,0 +1,8 @@
+[schema]
+indexed_fields = ["title", "category"]
+
+# Only one metadata string is supported
+metadata_fields = ["description"]
+
+# The filepath to the resource
+url_field = "url"

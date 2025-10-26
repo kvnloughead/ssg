@@ -142,20 +142,7 @@ function performSearch(evt) {
     if (results.length === 0) {
       displayNoResults(query, searchTime);
     } else {
-      const resultHTML = results
-        .map(
-          (result) => `
-                        <li class="result-item">
-                            <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
-                        </li>
-                    `
-        )
-        .join("");
-
-      resultsEl.innerHTML = resultHTML;
-      statusEl.textContent = `Found ${results.length} result${
-        results.length !== 1 ? "s" : ""
-      } for "${query}" (${searchTime}ms)`;
+      renderResults(results, query, searchTime);
     }
   } catch (error) {
     console.error("Search error:", error);
@@ -163,6 +150,33 @@ function performSearch(evt) {
       '<div class="error">Search failed. Check console for details.</div>';
     statusEl.innerHTML = `<div class="error">Search failed: ${error.message}</div>`;
   }
+}
+
+function renderResults(results, query, searchTime) {
+  const resultHTML = results
+    .map((result) => {
+      const url = updateUrl(result.url);
+      return { ...result, url };
+    })
+    .map(
+      (result) => `
+                        <li class="result-item">
+                            <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
+                        </li>
+                    `
+    )
+    .join("");
+
+  resultsEl.innerHTML = resultHTML;
+  statusEl.textContent = `Found ${results.length} result${
+    results.length !== 1 ? "s" : ""
+  } for "${query}" (${searchTime}ms)`;
+}
+
+/** updateUrl removes dates of the form YYYY-MM-DD- from a string and adds the .html extension. */
+function updateUrl(url) {
+  const dateRxYYYYMMDD = /\d{2,4}\-\d{2}-\d{2}\-/;
+  return url.replace(dateRxYYYYMMDD, "") + ".html";
 }
 
 // Initialize search engine

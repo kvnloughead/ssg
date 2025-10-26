@@ -1,3 +1,0 @@
-[schema]
-indexed_fields = ["title", "description", "category", "tags"]
-metadata_fields = ["url"]

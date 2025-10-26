@@ -13,7 +13,7 @@ tmp/
 # Output
 *.out
 public/
-static/js/tinysearch/fixtures
+static/js/tinysearch/**/index.json
 
 # Dependency directories
 vendor/
